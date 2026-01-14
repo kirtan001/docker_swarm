@@ -1,8 +1,16 @@
-FROM python:3.10-slim 
-WORKDIR /app 
-COPY requirements.txt . 
-RUN pip install --no-cache-dir -r requirements.txt 
-COPY train.py app.py ./ 
-RUN python train.py 
-EXPOSE 5000 
+FROM python:3.10-slim
+
+WORKDIR /app
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy application code
+COPY app.py ./
+
+# Copy trained model artifact
+COPY model.joblib ./
+
+EXPOSE 5000
+
 CMD ["python", "app.py"]
