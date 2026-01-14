@@ -1,32 +1,32 @@
-import pandas as pd 
-import joblib 
-import os 
-import urllib.request 
-from sklearn.model_selection import train_test_split 
-from sklearn.ensemble import RandomForestClassifier 
+import joblib
+from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+import os
 
-DATA_URL = "https://archive.ics.uci.edu/ml/machine-learningdatabases/iris/iris.data" 
-DATA_PATH = "iris.csv" 
+MODEL_PATH = "model.joblib"
 
-if not os.path.exists(DATA_PATH): 
-    urllib.request.urlretrieve(DATA_URL, DATA_PATH) 
+def train():
+    # Load built-in Iris dataset (stable & offline)
+    iris = load_iris(as_frame=True)
+    X = iris.data
+    y = iris.target
 
-columns = [ 
-    "sepal_length", "sepal_width", 
-    "petal_length", "petal_width", 
-    "class" 
-] 
-df = pd.read_csv(DATA_PATH, header=None, names=columns) 
+    # Train-test split
+    X_train, _, y_train, _ = train_test_split(
+        X, y, test_size=0.2, random_state=42, stratify=y
+    )
 
-X = df.drop("class", axis=1) 
-y = df["class"] 
+    # Train model
+    model = RandomForestClassifier(
+        n_estimators=100,
+        random_state=42
+    )
+    model.fit(X_train, y_train)
 
-X_train, _, y_train, _ = train_test_split( 
-    X, y, test_size=0.2, random_state=42 
-) 
+    # Save model
+    joblib.dump(model, MODEL_PATH)
+    print(f"✅ Iris model trained and saved at {MODEL_PATH}")
 
-model = RandomForestClassifier(n_estimators=100, random_state=42) 
-model.fit(X_train, y_train) 
-
-joblib.dump(model, "model.pkl") 
-print("Iris model trained and saved")
+if __name__ == "__main__":
+    train()
